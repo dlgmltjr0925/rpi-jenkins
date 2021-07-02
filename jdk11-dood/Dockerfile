@@ -73,6 +73,8 @@ COPY install-plugins.sh /usr/local/bin/install-plugins.sh
 
 FROM rpi-jenkins-jdk11
 
+USER root
+
 RUN apk add --no-cache docker
 
 ARG user=jenkins
@@ -82,4 +84,6 @@ ARG dood_group=dood
 RUN addgroup -g ${dood_gid} ${dood_group} \
   && addgroup -S ${user} ${dood_group}
 
-ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
+USER ${user}
+
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/jenkins.sh"]
