@@ -1,6 +1,6 @@
 FROM arm64v8/alpine:3.14.0
 
-RUN apk add --no-cache openjdk11 git openssh-client curl unzip bash ttf-dejavu coreutils
+RUN apk add --no-cache openjdk11 git openssh-client curl unzip bash ttf-dejavu gnupg coreutils
 
 ARG user=jenkins
 ARG group=jenkins
@@ -22,11 +22,11 @@ VOLUME [ "/var/jenkins_home" ]
 
 RUN mkdir -p ${ref}/init.groovy.d
 
-ENV TINI_VERSION 0.19.0
+ENV TINI_VERSION v0.19.0
 COPY tini_pub.gpg /var/jenkins_home/tini_pub.gpg
 
-RUN curl -fsSL https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-$(dpkg --print-architecture) -o /sbin/tini \
-  && curl -fsSL https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-$(dpkg --print-architecture).asc -o /sbin/tini.asc \
+RUN curl -fsSL https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-arm64 -o /sbin/tini \
+  && curl -fsSL https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-arm64.asc -o /sbin/tini.asc \
   && gpg --no-tty --import ${JENKINS_HOME}/tini_pub.gpg \
   && gpg --verify /sbin/tini.asc \
   && rm -rf /sbin/tini.asc /root/.gnupg \
@@ -65,6 +65,6 @@ RUN chmod +x /usr/local/bin/jenkins.sh
 
 USER ${user}
 
-ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/jenkins.sh"]
 
 COPY install-plugins.sh /usr/local/bin/install-plugins.sh
