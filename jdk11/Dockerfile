@@ -20,6 +20,8 @@ RUN addgroup -g ${gid} ${group} \
 
 VOLUME [ "/var/jenkins_home" ]
 
+RUN mkdir -p /usr/share/jenkins/ref/
+
 ENV TINI_VERSION v0.19.0
 COPY tini_pub.gpg /var/jenkins_home/tini_pub.gpg
 
